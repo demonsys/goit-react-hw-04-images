@@ -6,6 +6,8 @@ import Button from './Button/Button';
 import ErrorBlock from './ErrorBlock/ErrorBlock';
 import api from '.././services/pixabay-api';
 import css from './App.module.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default class App extends Component {
   state = {
@@ -45,6 +47,17 @@ export default class App extends Component {
     }
   }
   handleSearchbarSubmit = searchQuery => {
+    if (searchQuery.trim() === '') {
+      toast.warn('Search query is empty');
+      return this.setState({
+        status: 'idle',
+      });
+    }
+    if (searchQuery === this.state.searchQuery) {
+      return toast.warn(
+        `Search results for the query '${searchQuery}' are already on the screen`
+      );
+    }
     this.setState({
       searchQuery,
       hits: [],
@@ -59,6 +72,7 @@ export default class App extends Component {
   render() {
     const { status, hits, error, totalHits, page } = this.state;
     const notFound = totalHits === 0 && status === 'resolved';
+
     return (
       <div className={css.App}>
         <Searchbar onSubmit={this.handleSearchbarSubmit} />
@@ -74,6 +88,7 @@ export default class App extends Component {
         {totalHits / 12 > page && status === 'resolved' && (
           <Button onClick={this.onLoadMore} />
         )}
+        <ToastContainer />
       </div>
     );
   }
